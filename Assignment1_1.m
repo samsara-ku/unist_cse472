@@ -24,7 +24,7 @@ blue_img = result_img(:,:,3);
 
 % TASK 2
 r_filter = [1/4,1/2,1/4; 1/2,1,1/2; 1/4,1/2,1/4];
-g_filter = [0,0,0; 0,1,1/2; 0,1/2,0];
+g_filter = [0,1/4,0; 1/4,1,1/4; 0,1/4,0];
 b_filter = [1/4,1/2,1/4; 1/2,1,1/2; 1/4,1/2,1/4];
 
 bilinear_r = filter2(r_filter, red_img);
