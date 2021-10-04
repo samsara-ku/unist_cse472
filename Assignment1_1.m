@@ -36,8 +36,8 @@ result_img(:,:,2) = bilinear_g;
 result_img(:,:,3) = bilinear_b;
 
 % For checking difference between gt and interpolated result
-subplot(1,3,1), imshow(imcrop(ground_truth, [290 250 100 100]));
-subplot(1,3,2), imshow(imcrop(result_img, [290 250 100 100]));
+subplot(1,4,1), imshow(imcrop(ground_truth, [290 250 100 100]));
+subplot(1,4,2), imshow(imcrop(result_img, [290 250 100 100]));
 
 % TASK 3
 r_err = (ground_truth(:,:,1) - result_img(:,:,1));
@@ -45,8 +45,9 @@ g_err = (ground_truth(:,:,2) - result_img(:,:,2));
 b_err = (ground_truth(:,:,3) - result_img(:,:,3));
 squr_err = r_err.^2 + g_err.^2 + b_err.^2;
 
-% For checking squr err
-subplot(1,3,3), imshow(squr_err);
-
-avg_err = sum(squr_err, 'all') / (numel(r_err) * 3);
+avg_err = mean(squr_err, 'all');
 max_err = max(squr_err, [], 'all');
+
+% For checking squr err
+subplot(1,4,3), imshow(squr_err);
+subplot(1,4,4), imshow(squr_err, [0, avg_err]);
