@@ -1,4 +1,5 @@
-[concat_img] = imread('./data/00398v.jpg');
+file_name = '00398v';
+[concat_img] = imread(strcat('./data/', file_name, '.jpg'));
 
 [h, w] = size(concat_img);
 ratio = floor(h/3);
@@ -10,6 +11,9 @@ R_img = concat_img(ratio*2+1:ratio*3, :);
 
 % For checking result of naive alignment
 color_img = cat(3, R_img, G_img, B_img);
+
+imwrite(color_img, strcat(file_name, '.png'));
+
 
 % TASK 5
 [r_result, r_x1, r_y1, r_x2, r_y2] = align_img(concat_img, "red");
