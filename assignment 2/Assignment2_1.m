@@ -98,7 +98,7 @@ canvas2(start2:start2+a_row-1, start2:start2+a_col-1, 1) = cast(affine_img, 'dou
 canvas2(start2+dis_y2:start2+dis_y2+639, start2+dis_x2:start2+dis_x2+799, 2) = im2(1:640, 1:800);
 subplot(1,3,3); imshow(rescale(canvas2), []);
 %% TASK 5-1
-target_point = 30000;
+target_point = 10000;
 [im_left, harris_im_left, im_left_H]= Get_harris('./images/panorama/uttower_left.jpg');
 [~, idx] = sort(harris_im_left(:), 'descend');
 [row, col] = ind2sub(size(harris_im_left), idx(1:target_point));
@@ -107,7 +107,7 @@ im_left_filtered_harris = zeros(683, 1024);
 for idx = 1:target_point
     im_left_filtered_harris(row(idx), col(idx)) = harris_im_left(row(idx), col(idx));
 end
-im_left_nms_filtered_harris = Non_maximum_suppression(im_left_filtered_harris, 30);
+im_left_nms_filtered_harris = Non_maximum_suppression(im_left_filtered_harris, 10);
 
 [im_left_row, im_left_col] = find(im_left_nms_filtered_harris);
 subplot(1, 4, 1); imshow(im_left, []); hold on;
@@ -124,7 +124,7 @@ im_right_filtered_harris = zeros(683, 1024);
 for idx = 1:target_point
     im_right_filtered_harris(row2(idx), col2(idx)) = harris_im_right(row2(idx), col2(idx));
 end
-im_right_nms_filtered_harris = Non_maximum_suppression(im_right_filtered_harris, 30);
+im_right_nms_filtered_harris = Non_maximum_suppression(im_right_filtered_harris, 10);
 
 [im_right_row, im_right_col] = find(im_right_nms_filtered_harris);
 subplot(1, 4, 2); imshow(im_right, []); hold on;
@@ -139,7 +139,7 @@ im_right_filtered_row = [];
 im_right_filtered_col = [];
 
 for i = 1:length(im_left_col)
-    if (im_left_col(i) > 1024*2/3)
+    if (im_left_col(i) > 1024/2)
         im_left_filtered_row = [im_left_filtered_row; im_left_row(i)];
         im_left_filtered_col = [im_left_filtered_col; im_left_col(i)];
     end
@@ -162,26 +162,41 @@ subplot(1, 4, 4); imshow(im_right, []); hold on;
 plot(im_right_filtered_col, im_right_filtered_row, '+', 'MarkerEdgeColor', 'green'); hold on;
 for temp = 1:length(im_right_filtered_col)
     text(im_right_filtered_col(temp)-10, im_right_filtered_row(temp)-10, num2str(temp), 'color', 'red', 'fontsize', 10)
-end
+end    
 %% TASK 5-2
 [im_left_eigen_vec, im_left_eigen_val] = Get_eigen(im_left_H);
 [im_right_eigen_vec, im_right_eigen_val] = Get_eigen(im_right_H);
 
 result3 = Get_distance(im_left, im_right, im_left_eigen_vec, im_left_eigen_val, im_right_eigen_vec, im_right_eigen_val, im_left_filtered_row, im_left_filtered_col, im_right_filtered_row, im_right_filtered_col, "ssd");
+%%
+[v, d] = min(result3, [], 2);
+
+left = [im_left_filtered_col, im_left_filtered_row];
+right = [im_right_filtered_col, im_right_filtered_row];
+
+l = find(v(:) < 50);
+r = d(l(:));
+
+showMatching(im_left, im_right, left, right, [l, r]);
 %% TASK 5-3
-[inlier, homography_matrix, feat_idx] = RANSAC_homo(result3, im_left_filtered_row, im_left_filtered_col, im_right_filtered_row, im_right_filtered_col, 500000, 11);
+im_l_r = im_left_filtred_row(l);
+im_l_c = im_left_filtred_col(l);
+im_r_r = im_right_filtred_row(r);
+im_r_c = im_right_filtred_row(r);
+
+[inlier, homography_matrix, feat_idx] = RANSAC_homo(result3, im_l_r, im_l_c, im_r_r, im_r_c, 500000, 11);
 tform = projective2d(homography_matrix');
 homo_img = imwarp(im_left, tform);
 [t_row, t_col] = size(homo_img);
 
 subplot(1,2,1); imshow(im_right, []); hold on;
-plot(im_right_filtered_col(feat_idx(2,:)), im_right_filtered_row(feat_idx(2,:)), '+', 'MarkerEdgeColor', 'green'); hold on;
+plot(im_r_c(feat_idx(2,:)), im_r_r(feat_idx(2,:)), '+', 'MarkerEdgeColor', 'green'); hold on;
  
-im_left_trans_pos = homography_matrix * [im_left_col(feat_idx(1,:))'; im_left_row(feat_idx(1,:))'; 1 1 1 1];
+im_left_trans_pos = homography_matrix * [im_l_c(feat_idx(1,:))'; im_l_r(feat_idx(1,:))'; 1 1 1 1];
 im_left_trans_pos = im_left_trans_pos(1:3, :)./im_left_trans_pos(3,:);
  
 subplot(1,2,2); imshow(im_left, []); hold on;
-plot(im_left_filtered_col(feat_idx(1,:)), im_left_filtered_row(feat_idx(1,:)), '+', 'MarkerEdgeColor', 'green'); hold on;
+plot(im_l_c(feat_idx(1,:)), im_l_r(feat_idx(1,:)), '+', 'MarkerEdgeColor', 'green'); hold on;
 
 temp = zeros(683, 1024);
 temp(im_left_row(feat_idx(1,1)), im_left_row(feat_idx(1,1))) = 255;

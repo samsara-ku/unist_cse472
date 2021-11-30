@@ -23,6 +23,7 @@ function [dis] = Get_distance(img1, img2, eig_vec1, eig_val1, eig_vec2, eig_val2
 
                 if (1 <= cur_x1 && cur_x1 <= width1) && (1 <= cur_y1 && cur_y1 <= height1)
                     patch1(y1, x1) = rotated_img1(cur_y1, cur_x1);
+%                     patch1 = (patch1 - mean(patch1, 'all')) / sqrt(var(patch1, [],'all'));
                 end
             end
         end
@@ -48,6 +49,7 @@ function [dis] = Get_distance(img1, img2, eig_vec1, eig_val1, eig_vec2, eig_val2
 
                     if (1 <= cur_x2 && cur_x2 <= width2) && (1 <= cur_y2 && cur_y2 <= height2)
                         patch2(y2, x2) = rotated_img2(cur_y2, cur_x2);
+%                         patch2 = (patch2 - mean(patch2, 'all')) / sqrt(var(patch2, [], 'all'));
                     end
                 end
             end

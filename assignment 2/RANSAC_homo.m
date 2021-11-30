@@ -6,7 +6,7 @@ function [inlier, H, feat_idx] = RANSAC_homo(dismat, row1, col1, row2, col2, thr
     ratio = num_inlier / length(v);
     N = log(1-0.99) / log(1-ratio^4);
     
-    for i = 1:N
+    for i = 1:60000
         temp_inlier = 0;
         im1_min_idx = randsample(find(v(:) < threshold), 4)';
         im2_min_idx = d(im1_min_idx)';

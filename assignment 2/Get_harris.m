@@ -1,5 +1,6 @@
 function [img, f_harris, H] = Get_harris(image)
     img = imread(image);
+    img = rescale(img);
     [height, width, dim] = size(img);
     
     if dim == 3
