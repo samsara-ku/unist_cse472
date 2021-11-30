@@ -15,6 +15,11 @@ crop_size = [25 50 999 699];
 
 cropped_left = imcrop(warped_left_img, crop_size);
 cropped_right = imcrop(warped_right_img, crop_size);
+%%
+imshow(cropped_left); hold on;
+rectangle('Position', [425 235 45 55], 'Edgecolor', 'r');
+rectangle('Position', [535 235 45 55], 'Edgecolor', 'r');
+rectangle('Position', [535 305 45 55], 'Edgecolor', 'r');
 %% TASK 3
 disparity = find_disparity(cropped_left, cropped_right,  25, 'normal');
 disparity2 = find_disparity(cropped_left, cropped_right,  13, 'normal');
